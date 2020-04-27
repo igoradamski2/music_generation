@@ -32,6 +32,7 @@ class DataLinks(object):
     def get_links(self):
         links    = []
         duration = []
+        names    = []
         with open(self.file, encoding="utf-8") as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             line_count = 0
@@ -43,9 +44,11 @@ class DataLinks(object):
                     if row[2] == self.what_type:
                         links.append(row[4])
                         duration.append(float(row[-1]))
+                        names.append(row[0])
                     line_count += 1
         self.links = links
         self.duration = duration
+        self.names = names
     
     def get_number_of_examples(self):
         num_examples   = []

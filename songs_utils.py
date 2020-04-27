@@ -16,27 +16,40 @@ class FakeSong(DataLinks):
                  what_type,
                  link, 
                  name,
-                 contextLength, 
-                 start, 
-                 length,
                  numRegions,
-                 regionStarts,
-                 regionLengths):
+                 contextLength,
+                 length, 
+                 regionLengths,
+                 start = None, 
+                 regionStarts = None):
 
         super(FakeSong, self).__init__(file, what_type, 1, 1)
         self.link  = link
         self.name  = name
-        self.contextLength = contextLength
-        self.start = start
-        self.length = length
         self.numRegions = numRegions
-        self.regionStarts = regionStarts
+        self.contextLength = contextLength
+        self.length = length
         self.regionLengths = regionLengths
 
         # Figure out which link we are looking at
         link_index = self.links.index(self.link)
         self.duration = self.duration[link_index]
         del self.links
+
+        if start is None:
+            self.start = (self.duration - self.length)*random.random()*0.75
+        else:
+            self.start = start
+
+        if regionStarts is None:
+            self.regionStarts = []
+            for i in range(self.numRegions):
+                if i == 0:
+                    self.regionStarts.append(self.start + self.length*0.5*random.random())
+                else:
+                    self.regionStarts.append(self.regionStarts[-1] + self.regionLengths[i-1] + (self.length - self.regionStarts[-1])*0.5*random.random())
+        else:
+            self.regionStarts = regionStarts
 
         # Get training examples
         self.getTrainingExamples()
