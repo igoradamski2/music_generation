@@ -158,7 +158,7 @@ class FakeSong(DataLinks):
             elif (t>lookBack and t<=(steps-lookBack+1)):
                 return np.arange(t, t+lookBack, 1)
             elif t>(steps-lookBack+1):
-                return np.arange(t+1, steps+1, 1)
+                return np.arange(t, steps+1, 1)
 
         steps = params.lookBack + self.trainingExamples[trainingExampleId].target.shape[1] - 1
         for timestep in range(1,steps):
@@ -166,7 +166,7 @@ class FakeSong(DataLinks):
             stdout.write('\rtimestep {}/{}'.format(timestep, steps))
             stdout.flush()
             
-            if timestep == 63:
+            if timestep == (steps - params.lookBack+1):
                 print('hello')
             #prediction = model.predict([tf.convert_to_tensor(curr_test_batch.context, dtype = tf.float32), 
             #                            tf.convert_to_tensor(curr_test_batch.target_train, dtype = tf.float32)],
@@ -338,7 +338,7 @@ if __name__ == "__main__":
     file = 'maestro-v2.0.0/maestro-v2.0.0.csv'
     what_type = 'train'
     link = '2006/MIDI-Unprocessed_06_R1_2006_01-04_ORIG_MID--AUDIO_06_R1_2006_01_Track01_wav.midi'
-    name = 'test221ded1ws32'
+    name = 'test2s21ded1wsds32'
     contextLength = 100 # in timesteps
     start = 100
     length = 30
