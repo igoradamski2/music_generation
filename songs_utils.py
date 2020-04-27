@@ -144,21 +144,20 @@ class FakeSong(DataLinks):
         model = self.load_model(params.my_model_name, curr_test_batch, biaxial_pn_encoder_concat_deeplstm)
 
         def take_prediction(t, steps, lookBack):
-
             if t<=lookBack:
-                return -t
-            elif (t>lookBack & t<=(steps-lookBack+1)):
-                return -lookBack
-            else:
-                return steps-t+1
-        
+                return np.arange(lookBack-t, lookBack, 1)
+            elif (t>lookBack and t<=(steps-lookBack+1)):
+                return np.arange(0,lookBack, 1)
+            elif t>(steps-lookBack+1):
+                return np.arange(0, steps-t+1)
+            
         def output_indices(t, steps, lookBack):
 
             if t<=lookBack:
                 return np.arange(lookBack, lookBack+t, 1)
-            elif (t>lookBack & t<=(steps-lookBack+1)):
-                return np.arange(t+1, t+lookBack+1, 1)
-            else:
+            elif (t>lookBack and t<=(steps-lookBack+1)):
+                return np.arange(t, t+lookBack, 1)
+            elif t>(steps-lookBack+1):
                 return np.arange(t+1, steps+1, 1)
 
         steps = params.lookBack + self.trainingExamples[trainingExampleId].target.shape[1] - 1
@@ -167,17 +166,21 @@ class FakeSong(DataLinks):
             stdout.write('\rtimestep {}/{}'.format(timestep, steps))
             stdout.flush()
             
-            prediction = model.predict([tf.convert_to_tensor(curr_test_batch.context, dtype = tf.float32), 
-                                        tf.convert_to_tensor(curr_test_batch.target_train, dtype = tf.float32)],
-                                    steps = 1)[:,take_prediction(timestep, steps, params.lookBack):,:]
+            if timestep == 63:
+                print('hello')
+            #prediction = model.predict([tf.convert_to_tensor(curr_test_batch.context, dtype = tf.float32), 
+            #                            tf.convert_to_tensor(curr_test_batch.target_train, dtype = tf.float32)],
+            #                        steps = 1)[:,take_prediction(timestep, steps, params.lookBack),:]
             
+            prediction = np.random.rand(*curr_test_batch.target_train.shape[:-1])[:,take_prediction(timestep, steps, params.lookBack),:]
+
             notes = np.zeros(prediction.shape)
             
             turn_on = [params.turn_on_notes]*params.batch_size
             indx = output_indices(timestep, steps, params.lookBack)
             for t in range(notes.shape[1]):
 
-                articulation = np.multiply(prediction[:,t,:], final_output[:,indx[t],:])
+                articulation = np.multiply(prediction[:,t,:], final_output[:,indx[t]-1,:])
                 articulation[articulation >= params.articulation_prob] = 1
                 articulation[articulation < params.articulation_prob] = 0
                 articulated_notes = np.sum(articulation, axis = -1)
@@ -335,13 +338,17 @@ if __name__ == "__main__":
     file = 'maestro-v2.0.0/maestro-v2.0.0.csv'
     what_type = 'train'
     link = '2006/MIDI-Unprocessed_06_R1_2006_01-04_ORIG_MID--AUDIO_06_R1_2006_01_Track01_wav.midi'
-    name = 'firstsong'
+    name = 'test221ded1ws32'
     contextLength = 100 # in timesteps
-    start = 120
-    length = 350
-    numRegions = 5
-    regionStarts = [130, 200, 240, 305, 390]
-    regionLengths = [5, 10, 10, 10, 5]
+    start = 100
+    length = 30
+    numRegions = 2
+    regionStarts = [110, 125]
+    regionLengths = [8, 4]
+
+    params = Config(Config.__read_config_file__('generation_config.json'))
+    params = params.generation
+    params.batch_size = 1
 
     curr_song = FakeSong(file = file,
                         what_type = what_type,
@@ -353,7 +360,6 @@ if __name__ == "__main__":
                         numRegions = numRegions,
                         regionStarts = regionStarts,
                         regionLengths = regionLengths)
-    
 
     curr_song.fill_gaps(params)
 
