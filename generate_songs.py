@@ -36,11 +36,9 @@ if __name__ == "__main__":
 
 	for i in range(40):
 		linkObj, link, name = select_random_song(linkObj)
-		name = name + '_' +str(art_prob) + '_' + str(rmp_prob)
-		
 		for art_prob in [0.006, 0.008, 0.01, 0.02, 0.03]:
 			for rmp_prob in [0.2, 0.35, 0.4]:
-
+				name = name + '_' +str(art_prob) + '_' + str(rmp_prob)
 				params.articulation_prob = art_prob
 				params.remap_prob = rmp_prob
 
