@@ -99,7 +99,7 @@ class FakeSong(DataLinks):
         
         timesteps = piano_roll.shape[0]
 
-        self.sec_per_timestep = timesteps/self.duration
+        self.sec_per_timestep = self.duration/timesteps
 
         start = int(np.floor(timesteps * (self.start/self.duration)))
         end   = int(start + np.floor(timesteps * (self.length/self.duration)))
@@ -198,7 +198,7 @@ class FakeSong(DataLinks):
             
             curr_test_batch = copy.deepcopy(self.trainingExamples[trainingExampleId])
             
-            curr_test_batch.target[:,0:params.lookBack,:,0] = final_output[:,timestep:(params.lookBack+timestep)]
+            curr_test_batch.target[:,0:params.lookBack,:,0] = copy.deepcopy(final_output[:,timestep:(params.lookBack+timestep)])
 
 
             curr_test_batch.target_split = 0
@@ -211,7 +211,7 @@ class FakeSong(DataLinks):
     
     def fill_gaps(self, params):
 
-        self.fake_song_pianoroll = self.full_song_pianoroll
+        self.fake_song_pianoroll = copy.deepcopy(self.full_song_pianoroll)
 
         for patchId in tqdm(range(self.numRegions)):
             
@@ -233,7 +233,7 @@ class FakeSong(DataLinks):
         #fs.midi_to_audio((self.folderpath_ + "/true_song.mid"), (self.folderpath_ + "/true_song.flac"))
 
         # Save the fake song (in MIDI format)
-        noteStateMatrixToMidi(self.full_song_pianoroll, name = (self.folderpath_ + "/fake_song"))
+        noteStateMatrixToMidi(self.fake_song_pianoroll, name = (self.folderpath_ + "/fake_song"))
         # and in FLAC format
         #fs.midi_to_audio((self.folderpath_ + "/fake_song.mid"), (self.folderpath_ + "/fake_song.flac"))
 
@@ -310,9 +310,7 @@ class FakeSong(DataLinks):
 
 class Config(object):
 
-    def __init__(self, name):
-
-        d = self.read_config_file(name)
+    def __init__(self, d):
 
         for a, b in d.items():
             if isinstance(b, (list, tuple)):
@@ -321,7 +319,7 @@ class Config(object):
                setattr(self, a, Config(b) if isinstance(b, dict) else b)
     
     @staticmethod
-    def read_config_file(name):
+    def __read_config_file__(name):
 
         config_dict = {}
         with open(name) as f:
