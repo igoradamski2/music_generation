@@ -166,13 +166,7 @@ class FakeSong(DataLinks):
             stdout.write('\rtimestep {}/{}'.format(timestep, steps))
             stdout.flush()
             
-            if timestep == (steps - params.lookBack+1):
-                print('hello')
-            prediction = model.predict([tf.convert_to_tensor(curr_test_batch.context, dtype = tf.float32), 
-                                        tf.convert_to_tensor(curr_test_batch.target_train, dtype = tf.float32)],
-                                    steps = 1)[:,take_prediction(timestep, steps, params.lookBack),:]
-            
-            #prediction = np.random.rand(*curr_test_batch.target_train.shape[:-1])[:,take_prediction(timestep, steps, params.lookBack),:]
+            prediction = np.random.rand(*curr_test_batch.target_train.shape[:-1])[:,take_prediction(timestep, steps, params.lookBack),:]
 
             notes = np.zeros(prediction.shape)
             
@@ -280,10 +274,10 @@ class FakeSong(DataLinks):
             prediction[batch, :][turn_off] = 0
             
             if normalize: 
-                prediction[batch, timestep, :] = st.norm.cdf((prediction[batch, timestep, :] - 
-                                                    np.mean(prediction[batch, timestep, :][prediction[batch, timestep, :] > 0]))/
-                                                np.sqrt(np.var(prediction[batch, timestep, :][prediction[batch, timestep, :]>0])))/divide_prob
-                prediction[batch, timestep, :][turn_off] = 0
+                prediction[batch, :] = st.norm.cdf((prediction[batch, :] - 
+                                                    np.mean(prediction[batch, :][prediction[batch, :] > 0]))/
+                                                np.sqrt(np.var(prediction[batch, :][prediction[batch, :]>0])))/divide_prob
+                prediction[batch, :][turn_off] = 0
             
             if remap_to_max:
                 prediction[batch, :] /= prediction[batch, :].max()
@@ -338,7 +332,7 @@ if __name__ == "__main__":
     file = 'maestro-v2.0.0/maestro-v2.0.0.csv'
     what_type = 'train'
     link = '2006/MIDI-Unprocessed_06_R1_2006_01-04_ORIG_MID--AUDIO_06_R1_2006_01_Track01_wav.midi'
-    name = 'test2s21ded1wsds32'
+    name = 'test2s21ded1dwsds32'
     contextLength = 100 # in timesteps
     start = 100
     length = 30
