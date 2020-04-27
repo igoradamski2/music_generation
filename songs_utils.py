@@ -104,7 +104,7 @@ class FakeSong(DataLinks):
         start = int(np.floor(timesteps * (self.start/self.duration)))
         end   = int(start + np.floor(timesteps * (self.length/self.duration)))
 
-        self.full_song_pianoroll = piano_roll[start:end]
+        self.full_song_pianoroll = DataObject.drop_articulation3d(piano_roll[start:end])
 
     def getTargetIndices(self):
 
@@ -221,6 +221,11 @@ class FakeSong(DataLinks):
     def save_songs(self):
 
         #fs = FluidSynth()
+        self.full_song_pianoroll = np.append(np.expand_dims(self.full_song_pianoroll, axis = -1), 
+                                             np.expand_dims(self.full_song_pianoroll, axis = -1), axis = -1)
+
+        self.fake_song_pianoroll = np.append(np.expand_dims(self.fake_song_pianoroll, axis = -1), 
+                                             np.expand_dims(self.fake_song_pianoroll, axis = -1), axis = -1)
 
         # Save the true song (in MIDI format)
         noteStateMatrixToMidi(self.full_song_pianoroll, name = (self.folderpath_ + "/true_song"))
@@ -242,7 +247,7 @@ class FakeSong(DataLinks):
                      'realRegionStarts':[idx[0]*self.sec_per_timestep for idx in self.targetIdx],
                      'realRegionEnds':[idx[1]*self.sec_per_timestep for idx in self.targetIdx]}
         
-        with open('song_metadata.json', 'w+') as fp:
+        with open((self.folderpath_+'/song_metadata.json'), 'w+') as fp:
             json.dump(save_data, fp)
 
 
@@ -315,7 +320,8 @@ class Config(object):
             else:
                setattr(self, a, Config(b) if isinstance(b, dict) else b)
     
-    def read_config_file(self, name):
+    @staticmethod
+    def read_config_file(name):
 
         config_dict = {}
         with open(name) as f:

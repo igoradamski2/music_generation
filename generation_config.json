@@ -1,5 +1,5 @@
 {
-    "generation":{
+    "generation": {
 
         "my_model_name": "biaxial_pn_encoder_concat_deeplstm_cont.h5",
         "normalize": false,
