@@ -2,9 +2,13 @@ import numpy as np
 from sys import stdout
 import copy
 from tqdm import tqdm
+import json
+import os
+#from midi2audio import FluidSynth
 
-from loading import DataLinks, TrainingExample, DataObject
+from loading import *
 from models import *
+import midi_to_statematrix
 
 class FakeSong(DataLinks):
     def __init__(self, 
@@ -28,6 +32,10 @@ class FakeSong(DataLinks):
         self.numRegions = numRegions
         self.regionStarts = regionStarts
         self.regionLengths = regionLengths
+
+        assert os.path.isdir("samples/"+name) is True, "Pick different folder name (param: name), as this one exists"
+
+        self.folderpath_ = "./samples/"+name
 
         # Figure out which link we are looking at
         link_index = self.links.index(self.link)
@@ -175,6 +183,7 @@ class FakeSong(DataLinks):
                 
                 play_notes = self.turn_probabilities_to_notes(prediction[:,t,:], 
                                                 turn_on = turn_on - articulated_notes,
+                                                remap_prob = params.remap_prob,
                                                 how = 'random', 
                                                 normalize = params.normalize,
                                                 divide_prob = params.divide_prob, 
@@ -208,6 +217,32 @@ class FakeSong(DataLinks):
             generated_patch = self.generate_patch(patchId, params)
             self.fake_song_pianoroll[self.targetIdx[patchId][0]:self.targetIdx[patchId][1]] = generated_patch[0] # 0th batch 
 
+    def save_songs(self):
+
+        #fs = FluidSynth()
+
+        # Save the true song (in MIDI format)
+        noteStateMatrixToMidi(self.full_song_pianoroll, name = (self.folderpath_ + "/true_song"))
+        # and in FLAC format
+        #fs.midi_to_audio((self.folderpath_ + "/true_song.mid"), (self.folderpath_ + "/true_song.flac"))
+
+        # Save the fake song (in MIDI format)
+        noteStateMatrixToMidi(self.full_song_pianoroll, name = (self.folderpath_ + "/fake_song"))
+        # and in FLAC format
+        #fs.midi_to_audio((self.folderpath_ + "/fake_song.mid"), (self.folderpath_ + "/fake_song.flac"))
+
+        # Save all the generation parameters
+        save_data = {'link':self.link,
+                     'start':self.start,
+                     'end':self.start+self.length,
+                     'numRegions':self.numRegions,
+                     'regionStarts':self.regionStarts,
+                     'regionLengths':self.regionLengths,
+                     'realRegionStarts':[idx[0]*self.sec_per_timestep for idx in self.targetIdx],
+                     'realRegionEnds':[idx[1]*self.sec_per_timestep for idx in self.targetIdx]}
+        
+        with open('song_metadata.json', 'w+') as fp:
+            json.dump(save_data, fp)
 
 
     @staticmethod
@@ -220,7 +255,8 @@ class FakeSong(DataLinks):
 
     @staticmethod
     def turn_probabilities_to_notes(prediction, 
-                                    turn_on, 
+                                    turn_on,
+                                    remap_prob, 
                                     how = 'random', 
                                     normalize = True, 
                                     threshold = 0.1, 
@@ -266,6 +302,29 @@ class FakeSong(DataLinks):
         return notes
     
 
+class Config(object):
+
+    def __init__(self, name):
+
+        d = self.read_config_file(name)
+
+        for a, b in d.items():
+            if isinstance(b, (list, tuple)):
+               setattr(self, a, [Config(x) if isinstance(x, dict) else x for x in b])
+            else:
+               setattr(self, a, Config(b) if isinstance(b, dict) else b)
+    
+    def read_config_file(self, name):
+
+        config_dict = {}
+        with open(name) as f:
+            data = json.load(f)
+            for p in data:
+                config_dict[p] = data[p]
+
+        return config_dict
+
+
 if __name__ == "__main__":
 
     file = 'maestro-v2.0.0/maestro-v2.0.0.csv'
@@ -289,6 +348,9 @@ if __name__ == "__main__":
                         numRegions = numRegions,
                         regionStarts = regionStarts,
                         regionLengths = regionLengths)
+    
+
+    curr_song.fill_gaps(params)
 
     
 
