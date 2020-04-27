@@ -33,9 +33,10 @@ class FakeSong(DataLinks):
         self.regionStarts = regionStarts
         self.regionLengths = regionLengths
 
-        assert os.path.isdir("samples/"+name) is True, "Pick different folder name (param: name), as this one exists"
+        assert os.path.isdir("samples/"+name) is False, "Pick different folder name (param: name), as this one exists"
 
         self.folderpath_ = "./samples/"+name
+        os.mkdir(self.folderpath_)
 
         # Figure out which link we are looking at
         link_index = self.links.index(self.link)
