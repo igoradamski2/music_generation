@@ -11,7 +11,7 @@ def select_random_song(linkObj):
 		name = (linkObj.names[song_index])
 		linkObj.used_names[(linkObj.names[song_index])] = 1
 	
-	return linkObj, random_song, name
+	return linkObj, random_song[0], name
 
 
 
@@ -45,8 +45,7 @@ if __name__ == "__main__":
 				np.random.shuffle(regionLengths)
 
 				try:
-					curr_song = FakeSong(self, 
-										file = file, 
+					curr_song = FakeSong(file = file, 
 										what_type = what_type,
 										link = link, 
 										name = name,
@@ -58,7 +57,7 @@ if __name__ == "__main__":
 					curr_song.save_songs(curr_song.name)
 				
 				except:
-					break
+					continue
 				
 
 
