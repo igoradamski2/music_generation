@@ -33,11 +33,6 @@ class FakeSong(DataLinks):
         self.regionStarts = regionStarts
         self.regionLengths = regionLengths
 
-        assert os.path.isdir("samples/"+name) is False, "Pick different folder name (param: name), as this one exists"
-
-        self.folderpath_ = "./samples/"+name
-        os.mkdir(self.folderpath_)
-
         # Figure out which link we are looking at
         link_index = self.links.index(self.link)
         self.duration = self.duration[link_index]
@@ -166,7 +161,11 @@ class FakeSong(DataLinks):
             stdout.write('\rtimestep {}/{}'.format(timestep, steps))
             stdout.flush()
             
-            prediction = np.random.rand(*curr_test_batch.target_train.shape[:-1])[:,take_prediction(timestep, steps, params.lookBack),:]
+            prediction = model.predict([tf.convert_to_tensor(curr_test_batch.context, dtype = tf.float32), 
+                                        tf.convert_to_tensor(curr_test_batch.target_train, dtype = tf.float32)],
+                                    steps = 1)[:,take_prediction(timestep, steps, params.lookBack),:]
+            
+            #prediction = np.random.rand(*curr_test_batch.target_train.shape[:-1])[:,take_prediction(timestep, steps, params.lookBack),:]
 
             notes = np.zeros(prediction.shape)
             
@@ -215,7 +214,12 @@ class FakeSong(DataLinks):
             generated_patch = self.generate_patch(patchId, params)
             self.fake_song_pianoroll[self.targetIdx[patchId][0]:self.targetIdx[patchId][1]] = generated_patch[0] # 0th batch 
 
-    def save_songs(self):
+    def save_songs(self, name):
+
+        assert os.path.isdir("samples/"+name) is False, "Pick different folder name (param: name), as this one exists"
+
+        self.folderpath_ = "./samples/"+name
+        os.mkdir(self.folderpath_)
 
         #fs = FluidSynth()
         self.full_song_pianoroll = np.append(np.expand_dims(self.full_song_pianoroll, axis = -1), 
