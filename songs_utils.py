@@ -136,6 +136,9 @@ class FakeSong(DataLinks):
                                 params.lookBack+self.trainingExamples[trainingExampleId].target.shape[1]+params.lookBack, #timesteps
                                 78))                      # note size
 
+        if curr_test_batch.context.shape[2] < params.lookBack:
+            print('Reducing lookback')
+            params.lookBack = curr_test_batch.context.shape[2]
         # Populate from the front
         final_output[:,0:params.lookBack,:] = curr_test_batch.context[0,:,-params.lookBack:,:]
 
