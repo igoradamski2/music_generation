@@ -175,11 +175,11 @@ class FakeSong(DataLinks):
             stdout.write('\rtimestep {}/{}'.format(timestep, steps))
             stdout.flush()
             
-            #prediction = model.predict([tf.convert_to_tensor(curr_test_batch.context, dtype = tf.float32), 
-            #                            tf.convert_to_tensor(curr_test_batch.target_train, dtype = tf.float32)],
-            #                        steps = 1)[:,take_prediction(timestep, steps, params.lookBack),:]
+            prediction = model.predict([tf.convert_to_tensor(curr_test_batch.context, dtype = tf.float32), 
+                                        tf.convert_to_tensor(curr_test_batch.target_train, dtype = tf.float32)],
+                                    steps = 1)[:,take_prediction(timestep, steps, params.lookBack),:]
             
-            prediction = np.random.rand(*curr_test_batch.target_train.shape[:-1])[:,take_prediction(timestep, steps, params.lookBack),:]
+            #prediction = np.random.rand(*curr_test_batch.target_train.shape[:-1])[:,take_prediction(timestep, steps, params.lookBack),:]
 
             notes = np.zeros(prediction.shape)
             
