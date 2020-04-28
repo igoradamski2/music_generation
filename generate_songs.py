@@ -44,20 +44,17 @@ if __name__ == "__main__":
 
 				np.random.shuffle(regionLengths)
 
-				try:
-					curr_song = FakeSong(file = file, 
-										what_type = what_type,
-										link = link, 
-										name = name,
-										numRegions = numRegions,
-										contextLength = contextLength,
-										length = length, 
-										regionLengths = regionLengths)
-					curr_song.fill_gaps(params)
-					curr_song.save_songs(curr_song.name)
+				curr_song = FakeSong(file = file, 
+									 what_type = what_type,
+									 link = link, 
+									 name = name,
+									 numRegions = numRegions,
+									 contextLength = contextLength,
+									 length = length, 
+									 regionLengths = regionLengths)
+				curr_song.fill_gaps(params)
+				curr_song.save_songs(curr_song.name)
 				
-				except:
-					continue
 				
 
 
