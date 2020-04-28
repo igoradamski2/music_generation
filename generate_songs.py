@@ -10,6 +10,8 @@ def select_random_song(linkObj):
 	else:
 		name = (linkObj.names[song_index])
 		linkObj.used_names[(linkObj.names[song_index])] = 1
+
+	name.replace("/", "-")
 	
 	return linkObj, random_song[0], name
 
