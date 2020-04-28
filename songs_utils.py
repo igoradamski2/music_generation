@@ -195,7 +195,7 @@ class FakeSong(DataLinks):
                 play_notes = self.turn_probabilities_to_notes(prediction[:,t,:], 
                                                 turn_on = turn_on - articulated_notes,
                                                 remap_prob = params.remap_prob,
-                                                how = 'random', 
+                                                how = params.how, 
                                                 normalize = params.normalize,
                                                 divide_prob = params.divide_prob, 
                                                 remap_to_max = params.remap_to_max)
@@ -284,6 +284,10 @@ class FakeSong(DataLinks):
                                     divide_prob = 2,
                                     remap_to_max = True):
         
+        if how == 'raw':
+            notes =  np.random.binomial(1, p=prediction)
+            return notes
+
         for batch in range(prediction.shape[0]):
             if turn_on[batch] <= 1:
                 prediction[batch, :] = 0

@@ -2,6 +2,7 @@
     "generation": {
 
         "my_model_name": "biaxial_pn_encoder_concat_deeplstm_cont.h5",
+        "how": "random",
         "normalize": false,
         "remap_to_max": true,
         "turn_on_notes": 8,

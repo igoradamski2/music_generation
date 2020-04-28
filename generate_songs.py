@@ -38,24 +38,26 @@ if __name__ == "__main__":
 
 	for i in range(10):
 		linkObj, link, name = select_random_song(linkObj)
-		for art_prob in [0.008, 0.05, 0.1, 0.25]:
-			for rmp_prob in [0.2, 0.4, 0.6]:
-				name2 = name + '_' +str(art_prob) + '_' + str(rmp_prob)
-				params.articulation_prob = art_prob
-				params.remap_prob = rmp_prob
+		for art_prob in [0.05, 0.07, 0.085, 0.095]:
+			for rmp_prob in [0.4, 0.45, 0.5]:
+				for how in ["random", "raw"]:
+					name2 = name + '_' +str(art_prob) + '_' + str(rmp_prob) + '_' + how
+					params.articulation_prob = art_prob
+					params.remap_prob = rmp_prob
+					params.how = how
 
-				np.random.shuffle(regionLengths)
+					np.random.shuffle(regionLengths)
 
-				curr_song = FakeSong(file = file, 
-									 what_type = what_type,
-									 link = link, 
-									 name = name2,
-									 numRegions = numRegions,
-									 contextLength = contextLength,
-									 length = length, 
-									 regionLengths = regionLengths)
-				curr_song.fill_gaps(params)
-				curr_song.save_songs(curr_song.name)
+					curr_song = FakeSong(file = file, 
+										 what_type = what_type,
+										 link = link, 
+										 name = name2,
+										 numRegions = numRegions,
+										 contextLength = contextLength,
+										 length = length, 
+										 regionLengths = regionLengths)
+					curr_song.fill_gaps(params)
+					curr_song.save_songs(curr_song.name)
 				
 				
 
