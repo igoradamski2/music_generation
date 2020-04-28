@@ -43,9 +43,9 @@ class FakeSong(DataLinks):
 
         if regionStarts is None:
             self.regionStarts = []
-            self.regionStarts.append(self.start + 10*random.random())
-            self.regionStarts.append(self.regionStarts[-1] + self.regionLengths[0] + 10*random.random())
-            self.regionStarts.append(self.regionStarts[-1] + self.regionLengths[1] + 12*random.random())
+            self.regionStarts.append(self.start + 5*random.random())
+            self.regionStarts.append(self.regionStarts[-1] + self.regionLengths[0] + 8*random.random())
+            self.regionStarts.append(self.regionStarts[-1] + self.regionLengths[1] + 10*random.random())
             self.regionStarts.append(self.regionStarts[-1] + self.regionLengths[2] + 15*random.random())
             
         else:
