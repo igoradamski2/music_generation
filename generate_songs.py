@@ -11,7 +11,7 @@ def select_random_song(linkObj):
 		name = (linkObj.names[song_index])
 		linkObj.used_names[(linkObj.names[song_index])] = 1
 
-	name.replace("/", "-")
+	name = name.replace("/", "-")
 	
 	return linkObj, random_song[0], name
 
@@ -36,10 +36,10 @@ if __name__ == "__main__":
 	linkObj = DataLinks(file, what_type, 10, 10)
 	linkObj.used_names = {}
 
-	for i in range(40):
+	for i in range(10):
 		linkObj, link, name = select_random_song(linkObj)
-		for art_prob in [0.006, 0.008, 0.01, 0.02, 0.03]:
-			for rmp_prob in [0.2, 0.35, 0.4]:
+		for art_prob in [0.008, 0.05, 0.1, 0.25]:
+			for rmp_prob in [0.2, 0.4, 0.6]:
 				name2 = name + '_' +str(art_prob) + '_' + str(rmp_prob)
 				params.articulation_prob = art_prob
 				params.remap_prob = rmp_prob
