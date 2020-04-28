@@ -40,7 +40,7 @@ if __name__ == "__main__":
 		linkObj, link, name = select_random_song(linkObj)
 		for art_prob in [0.006, 0.008, 0.01, 0.02, 0.03]:
 			for rmp_prob in [0.2, 0.35, 0.4]:
-				name = name + '_' +str(art_prob) + '_' + str(rmp_prob)
+				name2 = name + '_' +str(art_prob) + '_' + str(rmp_prob)
 				params.articulation_prob = art_prob
 				params.remap_prob = rmp_prob
 
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 				curr_song = FakeSong(file = file, 
 									 what_type = what_type,
 									 link = link, 
-									 name = name,
+									 name = name2,
 									 numRegions = numRegions,
 									 contextLength = contextLength,
 									 length = length, 
