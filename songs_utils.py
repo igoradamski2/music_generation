@@ -4,6 +4,8 @@ import copy
 from tqdm import tqdm
 import json
 import os
+import math
+import itertools
 #from midi2audio import FluidSynth
 
 from loading import *
@@ -170,6 +172,8 @@ class FakeSong(DataLinks):
                 return np.arange(t, steps+1, 1)
 
         steps = params.lookBack + self.trainingExamples[trainingExampleId].target.shape[1] - 1
+
+        mean_art = self.get_mean_context_articulation(curr_test_batch.context) # mean articulation in contexts
         for timestep in range(1,steps):
             
             stdout.write('\rtimestep {}/{}'.format(timestep, steps))
@@ -182,14 +186,34 @@ class FakeSong(DataLinks):
             #prediction = np.random.rand(*curr_test_batch.target_train.shape[:-1])[:,take_prediction(timestep, steps, params.lookBack),:]
 
             notes = np.zeros(prediction.shape)
-            
+
             turn_on = [params.turn_on_notes]*params.batch_size
             indx = output_indices(timestep, steps, params.lookBack)
             for t in range(notes.shape[1]):
 
                 articulation = np.multiply(prediction[:,t,:], final_output[:,indx[t]-1,:])
-                articulation[articulation >= params.articulation_prob] = 1
-                articulation[articulation < params.articulation_prob] = 0
+                articulation[articulation >= params.articulation_prob/mean_art] = 1
+                articulation[articulation < params.articulation_prob/mean_art] = 0
+
+                if timestep == 1:
+                    currently_articulated = {note_id:1 for note_id in np.where(articulation[0,:] == 1)[0]}
+                else:
+                    for note_id in np.where(articulation[0,:] == 1)[0]:
+                        if note_id not in currently_articulated.keys():
+                            currently_articulated.update({note_id:1})
+                        else:
+                            currently_articulated[note_id] += 1
+
+                # Here we need to dearticulate the notes that are articulated for too long
+                for note_id in currently_articulated.keys():
+                    if currently_articulated[note_id] > mean_art:
+                        # Choice
+                        if np.random.binomial(1, prediction[:,t,note_id]/(currently_articulated[note_id] - mean_art)) == 0:
+                            articulation[:,note_id] = 0
+                            currently_articulated.pop(note_id, None)
+                    
+                    prediction[:,t,note_id] = 0
+
                 articulated_notes = np.sum(articulation, axis = -1)
                 
                 play_notes = self.turn_probabilities_to_notes(prediction[:,t,:], 
@@ -198,7 +222,8 @@ class FakeSong(DataLinks):
                                                 how = params.how, 
                                                 normalize = params.normalize,
                                                 divide_prob = params.divide_prob, 
-                                                remap_to_max = params.remap_to_max)
+                                                remap_to_max = params.remap_to_max,
+                                                silence_threshold = params.silence_threshold)
                 
                 play_notes = play_notes + articulation
                 play_notes[play_notes >= 1] = 1
@@ -273,6 +298,25 @@ class FakeSong(DataLinks):
         new_model.load_weights(file)
     
         return new_model
+    
+    @staticmethod
+    def get_mean_context_articulation(my_context):
+        mean_articulation = 0
+        for ctx in range(my_context.shape[1]):
+            art = 0
+            num = 0
+            for note in range(my_context.shape[-1]):
+                my_lst = [sum( 1 for _ in group ) - 1 for key, group in itertools.groupby(my_context[0,ctx,:,note]) if key]
+                my_lst = list(filter(lambda a: a != 0, my_lst))
+                art += sum(my_lst)
+                num += len(my_lst)
+
+            if num>0:
+                mean_articulation += art/num
+            else:
+                mean_articulation += 0
+        
+        return math.ceil(mean_articulation/2)
 
     @staticmethod
     def turn_probabilities_to_notes(prediction, 
@@ -282,11 +326,15 @@ class FakeSong(DataLinks):
                                     normalize = True, 
                                     threshold = 0.1, 
                                     divide_prob = 2,
-                                    remap_to_max = True):
+                                    remap_to_max = True,
+                                    silence_threshold = 0.1):
         
         if how == 'raw':
             notes =  np.random.binomial(1, p=prediction)
             return notes
+
+        if np.any(prediction >= silence_threshold) is False:
+            return np.zeros(prediction.shape)
 
         for batch in range(prediction.shape[0]):
             if turn_on[batch] <= 1:
@@ -304,6 +352,9 @@ class FakeSong(DataLinks):
             if remap_to_max:
                 prediction[batch, :] /= prediction[batch, :].max()
                 prediction[batch, :] *= remap_prob
+            else:
+                mult_factor = np.sqrt((1/prediction[0,:].max()))
+                prediction[batch, :] *= mult_factor
             
         if how == 'random':
             
@@ -378,6 +429,14 @@ if __name__ == "__main__":
                         regionLengths = regionLengths)
 
     curr_song.fill_gaps(params)
+
+
+    ## IDEAS
+    # so far it seems that articulation = 0.05 looks the best
+    # need to tune the remap_prob a bit more and even maybe try normalizing again
+    # or simply not remap to max but multiply by a number and cap
+    # we could hold a dataset of number of notes played at each timestep in contexts
+    # and sample from that at every timestep
 
     
 
