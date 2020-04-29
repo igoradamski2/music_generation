@@ -205,7 +205,7 @@ class FakeSong(DataLinks):
                             currently_articulated[note_id] += 1
 
                 # Here we need to dearticulate the notes that are articulated for too long
-                for note_id in currently_articulated.keys():
+                for note_id in currently_articulated.copy().keys():
                     if currently_articulated[note_id] > mean_art:
                         # Choice
                         if np.random.binomial(1, prediction[:,t,note_id]/(currently_articulated[note_id] - mean_art)) == 0:
