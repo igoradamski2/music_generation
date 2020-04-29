@@ -195,7 +195,7 @@ class FakeSong(DataLinks):
                 articulation[articulation >= params.articulation_prob/mean_art] = 1
                 articulation[articulation < params.articulation_prob/mean_art] = 0
 
-                if timestep == 1:
+                if t == 0:
                     currently_articulated = {note_id:1 for note_id in np.where(articulation[0,:] == 1)[0]}
                 else:
                     for note_id in np.where(articulation[0,:] == 1)[0]:
@@ -350,6 +350,10 @@ class FakeSong(DataLinks):
                 prediction[batch, :][turn_off] = 0
             
             if remap_to_max:
+                if prediction[batch, :].max() == 0:
+                    with open('curious_error.log', 'w+') as f:
+                        f.write("turn_on[batch]={}".format(turn_on[batch]))
+                    continue 
                 prediction[batch, :] /= prediction[batch, :].max()
                 prediction[batch, :] *= remap_prob
             else:

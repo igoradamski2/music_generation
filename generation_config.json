@@ -8,7 +8,7 @@
         "turn_on_notes": 8,
         "divide_prob": 2,
         "articulation_prob": 0.0018,
-        "remap_prob": 0.35,
+        "remap_prob": 0.5,
         "lookBack": 20,
         "silence_threshold": 0.08
 
