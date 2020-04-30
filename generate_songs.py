@@ -57,6 +57,15 @@ if __name__ == "__main__":
 				curr_song.fill_gaps(params)
 				curr_song.save_songs(curr_song.name)
 		
+		curr_song = FakeSong(file = file, 
+										what_type = what_type,
+										link = link, 
+										name = name2,
+										numRegions = numRegions,
+										contextLength = contextLength,
+										length = length, 
+										regionLengths = regionLengths)
+		
 		params.how = 'raw'
 		curr_song.fill_gaps(params)
 		curr_song.save_songs(name + '_raw')
