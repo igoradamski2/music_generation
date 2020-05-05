@@ -56,7 +56,9 @@ if __name__ == "__main__":
 										#regionLengths = regionLengths)
 				#curr_song.fill_gaps(params)
 				#curr_song.save_songs(curr_song.name)
+				pass
 
+			name2 = name + '_' +str(art_prob)
 			params.articulation_prob = art_prob
 			curr_song = FakeSong(file = file, 
 											what_type = what_type,
