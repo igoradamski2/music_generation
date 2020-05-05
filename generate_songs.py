@@ -36,39 +36,40 @@ if __name__ == "__main__":
 	linkObj = DataLinks(file, what_type, 10, 10)
 	linkObj.used_names = {}
 
-	for i in range(10):
+	for i in range(2):
 		linkObj, link, name = select_random_song(linkObj)
-		for art_prob in [0.3, 0.2, 0.1, 0.05]:
+		for art_prob in [0.5, 0.4, 0.3, 0.15, 0.05]:
 			for silence_threshold in [0.1, 0.01, 0.001]:
-				name2 = name + '_' +str(art_prob) + '_' + str(silence_threshold)
-				params.articulation_prob = art_prob
-				params.silence_threshold = silence_threshold
+				#name2 = name + '_' +str(art_prob) + '_' + str(silence_threshold)
+				#params.articulation_prob = art_prob
+				#params.silence_threshold = silence_threshold
 
-				np.random.shuffle(regionLengths)
+				#np.random.shuffle(regionLengths)
 
-				curr_song = FakeSong(file = file, 
-										what_type = what_type,
-										link = link, 
-										name = name2,
-										numRegions = numRegions,
-										contextLength = contextLength,
-										length = length, 
-										regionLengths = regionLengths)
-				curr_song.fill_gaps(params)
-				curr_song.save_songs(curr_song.name)
-		
-		curr_song = FakeSong(file = file, 
-										what_type = what_type,
-										link = link, 
-										name = name2,
-										numRegions = numRegions,
-										contextLength = contextLength,
-										length = length, 
-										regionLengths = regionLengths)
-		
-		params.how = 'raw'
-		curr_song.fill_gaps(params)
-		curr_song.save_songs(name + '_raw')
+				#curr_song = FakeSong(file = file, 
+										#what_type = what_type,
+										#link = link, 
+										#name = name2,
+										#numRegions = numRegions,
+										#contextLength = contextLength,
+										#length = length, 
+										#regionLengths = regionLengths)
+				#curr_song.fill_gaps(params)
+				#curr_song.save_songs(curr_song.name)
+
+			params.articulation_prob = art_prob
+			curr_song = FakeSong(file = file, 
+											what_type = what_type,
+											link = link, 
+											name = name2,
+											numRegions = numRegions,
+											contextLength = contextLength,
+											length = length, 
+											regionLengths = regionLengths)
+			
+			params.how = 'raw'
+			curr_song.fill_gaps(params)
+			curr_song.save_songs(name + '_raw')
 		
 
 				

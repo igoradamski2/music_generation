@@ -10,7 +10,8 @@
         "articulation_prob": 0.0018,
         "remap_prob": 0.5,
         "lookBack": 20,
-        "silence_threshold": 0.08
+        "silence_threshold": 0.08,
+        "raw_multiplier": 2
 
     }
     

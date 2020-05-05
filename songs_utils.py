@@ -213,6 +213,7 @@ class FakeSong(DataLinks):
                             currently_articulated.pop(note_id, None)
                     
                     prediction[:,t,note_id] = 0
+                    articulation[:,note_id] = 0
 
                 articulated_notes = np.sum(articulation, axis = -1)
                 
@@ -223,7 +224,8 @@ class FakeSong(DataLinks):
                                                 normalize = params.normalize,
                                                 divide_prob = params.divide_prob, 
                                                 remap_to_max = params.remap_to_max,
-                                                silence_threshold = params.silence_threshold)
+                                                silence_threshold = params.silence_threshold,
+                                                raw_multiplier = params.raw_multiplier)
                 
                 play_notes = play_notes + articulation
                 play_notes[play_notes >= 1] = 1
@@ -327,10 +329,13 @@ class FakeSong(DataLinks):
                                     threshold = 0.1, 
                                     divide_prob = 2,
                                     remap_to_max = True,
-                                    silence_threshold = 0.1):
+                                    silence_threshold = 0.1,
+                                    raw_multiplier = 2):
         
         if how == 'raw':
-            notes =  np.random.binomial(1, p=prediction)
+            prediction *= raw_multiplier
+            prediction[np.where(prediction > 1)] = 1 
+            notes = np.random.binomial(1, p=prediction)
             return notes
 
         if np.any(prediction >= silence_threshold) is False:
@@ -441,6 +446,8 @@ if __name__ == "__main__":
     # or simply not remap to max but multiply by a number and cap
     # we could hold a dataset of number of notes played at each timestep in contexts
     # and sample from that at every timestep
+
+    # Retrain the model!!! bigger window_size maybe or predict just next timestep, not sequence
 
     
 
