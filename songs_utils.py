@@ -225,7 +225,8 @@ class FakeSong(DataLinks):
                                                 divide_prob = params.divide_prob, 
                                                 remap_to_max = params.remap_to_max,
                                                 silence_threshold = params.silence_threshold,
-                                                raw_multiplier = params.raw_multiplier)
+                                                raw_multiplier = params.raw_multiplier,
+                                                modify_raw = params.modify_raw)
                 
                 play_notes = play_notes + articulation
                 play_notes[play_notes >= 1] = 1
@@ -330,12 +331,19 @@ class FakeSong(DataLinks):
                                     divide_prob = 2,
                                     remap_to_max = True,
                                     silence_threshold = 0.1,
-                                    raw_multiplier = 2):
+                                    raw_multiplier = 2,
+                                    modify_raw = True):
         
         if how == 'raw':
             prediction *= raw_multiplier
-            prediction[np.where(prediction > 1)] = 1 
+            prediction[np.where(prediction > 1)] = 1
             notes = np.random.binomial(1, p=prediction)
+
+            if modify_raw:
+                turned_on = np.multiply(notes, prediction)
+                for batch in range(prediction.shape[0]):
+                    turn_off = turned_on[batch, :].argsort()[:-int(turn_on[batch])]
+                    notes[batch, :][turn_off] = 0
             return notes
 
         if np.any(prediction >= silence_threshold) is False:

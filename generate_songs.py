@@ -39,39 +39,26 @@ if __name__ == "__main__":
 	for i in range(2):
 		linkObj, link, name = select_random_song(linkObj)
 		for art_prob in [0.5, 0.4, 0.3, 0.15, 0.05]:
-			for silence_threshold in [0.1, 0.01, 0.001]:
-				#name2 = name + '_' +str(art_prob) + '_' + str(silence_threshold)
-				#params.articulation_prob = art_prob
-				#params.silence_threshold = silence_threshold
+			for raw_mult in [0.8, 1, 1.5, 2]:	
+				for modify_raw in [True, False]:
+					name2 = name + '_artic=' +str(art_prob) + '_raw_mult='+str(raw_mult)+'_modify='+str(int(raw_mult))
+					
+					params.articulation_prob = art_prob
+					params.raw_multiplier = raw_mult
+					params.modify_raw = modify_raw
 
-				#np.random.shuffle(regionLengths)
-
-				#curr_song = FakeSong(file = file, 
-										#what_type = what_type,
-										#link = link, 
-										#name = name2,
-										#numRegions = numRegions,
-										#contextLength = contextLength,
-										#length = length, 
-										#regionLengths = regionLengths)
-				#curr_song.fill_gaps(params)
-				#curr_song.save_songs(curr_song.name)
-				pass
-
-			name2 = name + '_' +str(art_prob)
-			params.articulation_prob = art_prob
-			curr_song = FakeSong(file = file, 
-											what_type = what_type,
-											link = link, 
-											name = name2,
-											numRegions = numRegions,
-											contextLength = contextLength,
-											length = length, 
-											regionLengths = regionLengths)
-			
-			params.how = 'raw'
-			curr_song.fill_gaps(params)
-			curr_song.save_songs(name + '_raw')
+					curr_song = FakeSong(file = file, 
+										 what_type = what_type,
+										 link = link, 
+										 name = name2,
+										 numRegions = numRegions,
+										 contextLength = contextLength,
+										 length = length, 
+										 regionLengths = regionLengths)
+					
+					params.how = 'raw'
+					curr_song.fill_gaps(params)
+					curr_song.save_songs(name2)
 		
 
 				

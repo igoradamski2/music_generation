@@ -11,7 +11,8 @@
         "remap_prob": 0.5,
         "lookBack": 20,
         "silence_threshold": 0.08,
-        "raw_multiplier": 2
+        "raw_multiplier": 2,
+        "modify_raw": true
 
     }
     
