@@ -41,7 +41,7 @@ if __name__ == "__main__":
 		for art_prob in [0.5, 0.4, 0.3, 0.15, 0.05]:
 			for raw_mult in [0.8, 1, 1.5, 2]:	
 				for modify_raw in [True, False]:
-					name2 = name + '_artic=' +str(art_prob) + '_raw_mult='+str(raw_mult)+'_modify='+str(int(raw_mult))
+					name2 = name + '_artic=' +str(art_prob) + '_raw_mult='+str(raw_mult)+'_modify='+str(int(modify_raw))
 					
 					params.articulation_prob = art_prob
 					params.raw_multiplier = raw_mult
