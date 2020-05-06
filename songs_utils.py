@@ -212,8 +212,8 @@ class FakeSong(DataLinks):
                             articulation[:,note_id] = 0
                             currently_articulated.pop(note_id, None)
                     
-                    prediction[:,t,note_id] = 0
-                    articulation[:,note_id] = 0
+                            prediction[:,t,note_id] = 0
+
 
                 articulated_notes = np.sum(articulation, axis = -1)
                 
